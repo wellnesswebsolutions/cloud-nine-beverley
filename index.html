@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Cloud Nine — Beauty Salon, Beverley</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --line:#000;--grid:4px;--ink:#000;--paper:#ffffff;--paper-2:#f4f3f0;
+    --soft-red:#e8b2ab;--rouge:#6b1224;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{overflow:hidden;background:var(--line);color:var(--ink);
+    font-family:"Space Grotesk","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+
+  .stage{height:100vh;height:100dvh;width:100vw;background:var(--line);padding:var(--grid);
+    display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:var(--grid);}
+
+  .panel{position:relative;perspective:1700px;min-height:0;min-width:0;}
+  .panel-inner{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(0deg);
+    will-change:transform;transition:transform 700ms cubic-bezier(.2,.85,.25,1);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:var(--paper);overflow:hidden;}
+  .face.fa{transform:rotateY(0deg);}
+  .face.fb{transform:rotateY(180deg);}
+
+  .pad{position:absolute;inset:0;padding:clamp(15px,1.9vw,30px);display:flex;flex-direction:column;justify-content:center;gap:.5rem;color:var(--ink);}
+  .pad.center{align-items:center;text-align:center;}
+  .pad.theme-rouge{background:var(--rouge);color:#fff;}
+  .pad.svc2{justify-content:flex-start;gap:.3rem;}
+  .pad.svc2 .k2{margin-top:.9rem;}
+  .pad.owner{justify-content:flex-start;gap:.3rem;overflow-y:auto;scrollbar-width:none;}
+  .pad.owner::-webkit-scrollbar{display:none;}
+  .obio{font-size:clamp(.78rem,1.02vw,.92rem);font-weight:500;line-height:1.42;margin-top:.35rem;}
+  .kicker{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:700;}
+  h2{font-size:clamp(1.2rem,2vw,1.9rem);font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:.95;}
+  ul{list-style:none;}
+  .pad ul,.hsvc ul{display:flex;flex-direction:column;gap:.3rem;margin-top:.15rem;}
+  .pad li,.hsvc li{display:flex;justify-content:space-between;gap:1rem;font-size:clamp(.76rem,1.02vw,.92rem);font-weight:500;border-bottom:1px solid var(--line);padding-bottom:.3rem;}
+  .stmt{font-size:clamp(.9rem,1.3vw,1.1rem);font-weight:500;line-height:1.35;}
+  .addr{font-size:clamp(.85rem,1.1vw,1rem);font-weight:500;line-height:1.45;}
+  .contact,.contact2{font-size:.82rem;font-weight:500;line-height:1.5;letter-spacing:.03em;}
+
+  .photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:var(--paper-2);}
+  .map{position:absolute;inset:0;width:100%;height:100%;border:0;}
+
+  /* one-panel scrollable strips w/ both arrows */
+  .hwrap{position:absolute;inset:0;background:#000;}
+  .hstrip{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .hstrip::-webkit-scrollbar{display:none;}
+  .hstrip>*{flex:0 0 100%;min-width:100%;scroll-snap-align:start;}
+  .hphoto{background-size:cover;background-position:center;background-color:var(--paper-2);}
+  .haward,.hsvc{background:#fff;padding:clamp(16px,2vw,30px);display:flex;flex-direction:column;gap:.4rem;color:var(--ink);}
+  .haward{justify-content:center;}
+  .hsvc{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:38px;}
+  .hsvc::-webkit-scrollbar{display:none;}
+  .hsvc .kicker{position:sticky;top:0;background:#fff;padding-bottom:.4rem;z-index:1;}
+  .haward .aw{font-size:clamp(1rem,1.55vw,1.4rem);font-weight:700;text-transform:uppercase;line-height:1.02;}
+  .haward .by{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;}
+  /* bottom control bar: arrows + dots, minimal black */
+  .hctrl{position:absolute;left:0;right:0;bottom:8px;z-index:3;display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:none;}
+  .harrow{border:0;background:none;color:#000;font-size:30px;line-height:1;cursor:pointer;font-family:inherit;font-weight:700;opacity:.7;padding:0 2px;pointer-events:auto;text-shadow:0 0 5px rgba(255,255,255,.65);transition:opacity .2s,transform .2s;}
+  .harrow:hover{opacity:1;}
+  .harrow.next:hover{transform:translateX(2px);}
+  .harrow.prev:hover{transform:translateX(-2px);}
+  .hdots{display:flex;align-items:center;gap:6px;}
+  .hdot{width:6px;height:6px;border-radius:50%;background:#000;opacity:.3;box-shadow:0 0 3px rgba(255,255,255,.55);transition:opacity .25s,transform .25s;}
+  .hdot.on{opacity:.95;transform:scale(1.3);}
+
+  .booknow{margin-top:.8rem;align-self:center;color:#fff;text-decoration:none;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;transition:opacity .2s;}
+  .booknow:hover{opacity:.65;}
+  .btn{align-self:flex-start;margin-top:.3rem;border:2px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:.6rem 1.1rem;transition:background .2s,color .2s;}
+  .btn:hover{background:var(--line);color:#fff;}
+
+  /* nav / brand panel (persistent, black) */
+  .nav .face{display:flex;flex-direction:column;padding:clamp(18px,2vw,30px);gap:.4rem;background:#000;color:#fff;}
+  .brand-sub{font-size:10px;letter-spacing:.34em;text-transform:uppercase;font-weight:600;opacity:.55;}
+  .brand-sm{font-size:clamp(2.1rem,3.6vw,3.2rem);font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:.88;cursor:pointer;transition:opacity .2s;align-self:flex-start;}
+  .brand-sm:hover{opacity:.62;}
+  .menu{display:flex;flex-direction:column;gap:.05rem;margin-top:auto;margin-bottom:auto;padding-top:.6rem;}
+  .mi{display:flex;align-items:center;gap:.6rem;background:none;border:0;cursor:pointer;font-family:inherit;padding:.26rem 0;text-align:left;color:#fff;opacity:.42;transition:opacity .5s ease;width:100%;}
+  .mi .mn{font-size:10px;letter-spacing:.1em;font-weight:700;min-width:1.7em;padding:1px 4px;transition:background-color .5s ease,color .5s ease;}
+  .mi .ml{font-size:clamp(.85rem,1.05vw,.98rem);letter-spacing:.14em;text-transform:uppercase;font-weight:600;transition:letter-spacing .5s ease;}
+  .mi.active{opacity:1;}
+  .mi.active .mn{background:#fff;color:#000;}
+  .mi.active .ml{letter-spacing:.2em;}
+  .nav-foot{font-size:10px;letter-spacing:.3em;text-transform:uppercase;font-weight:600;opacity:.55;}
+
+  .cue{position:fixed;left:50%;bottom:calc(var(--grid) + 12px);transform:translateX(-50%);z-index:5;
+    display:flex;align-items:center;gap:.5rem;background:var(--paper);color:var(--ink);border:2px solid var(--line);
+    padding:.5rem .95rem;font-size:10px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;transition:opacity .5s;}
+  .cue.hide{opacity:0;pointer-events:none;}
+
+  /* booking overlay — form + phone split across a full-page grid */
+  .book-overlay{position:fixed;inset:0;z-index:20;background:var(--line);padding:var(--grid);display:none;}
+  .book-overlay.open{display:block;}
+  .bstage{height:100%;width:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:var(--grid);}
+  .bcell{background:#fff;padding:clamp(16px,2vw,30px);display:flex;flex-direction:column;justify-content:center;gap:.55rem;overflow:auto;}
+  .bcell.theme-rouge{background:var(--rouge);color:#fff;}
+  .bphone{font-size:clamp(1.5rem,2.8vw,2.4rem);font-weight:700;color:#fff;text-decoration:none;letter-spacing:.01em;line-height:1;}
+  .bcell label{display:flex;flex-direction:column;gap:.3rem;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;}
+  .bcell input,.bcell select,.bcell textarea{font-family:inherit;font-size:.95rem;font-weight:500;padding:.55rem;border:2px solid var(--line);background:#fff;color:#000;border-radius:0;width:100%;}
+  .bsubmit{border:2px solid #000;background:#000;color:#fff;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:.8rem;padding:.75rem 1rem;cursor:pointer;}
+  .bclose{border:2px solid #000;background:transparent;color:#000;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.68rem;padding:.5rem .9rem;cursor:pointer;margin-top:.5rem;}
+  .bok{font-size:clamp(1rem,1.5vw,1.3rem);font-weight:700;text-transform:uppercase;}
+
+  @media (max-width:720px){
+    .stage,.bstage{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);}
+    .panel-inner{transition-duration:560ms;}
+    .nav .face{padding:12px;gap:.1rem;}
+    .brand-sub,.nav-foot{display:none;}
+    .brand-sm{font-size:1.6rem;}
+    .menu{padding-top:.3rem;gap:0;margin:auto 0;}
+    .mi{padding:.1rem 0;gap:.4rem;}
+    .mi .mn{font-size:9px;min-width:1.5em;padding:1px 3px;}
+    .mi .ml{font-size:.7rem;letter-spacing:.06em;}
+    .harrow{width:34px;height:34px;font-size:17px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .panel-inner{transition:none!important;}.cue{display:none;}
+  }
+</style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <section class="panel" data-flip></section>
+    <section class="panel" data-flip></section>
+    <section class="panel nav">
+      <div class="panel-inner"><div class="face">
+        <div class="brand-sub">Beauty Salon</div>
+        <div class="brand-sm" id="brandHome" title="Back to Book">Cloud<br>Nine</div>
+        <nav class="menu" id="menu"></nav>
+        <div class="nav-foot">Beverley · Est. 1990s</div>
+      </div></div>
+    </section>
+    <section class="panel" data-flip></section>
+    <section class="panel" data-flip></section>
+    <section class="panel" data-flip></section>
+  </main>
+
+  <div class="cue" id="cue"><span>Scroll</span><span>&#8964;</span></div>
+
+  <!-- Booking page: phone + form split across the grid -->
+  <div class="book-overlay" id="bookOverlay" aria-hidden="true">
+    <div class="bstage">
+      <div class="bcell"><span class="kicker">Cloud Nine</span><h2>Book an appointment</h2><p class="stmt">Send a request and we&rsquo;ll confirm your time, or call the salon directly.</p></div>
+      <div class="bcell theme-rouge"><span class="kicker">Call the salon</span><a class="bphone" href="tel:+441482882805">01482&nbsp;882805</a><span class="contact2">9 Landress Lane, Beverley&nbsp;HU17&nbsp;8HA</span></div>
+      <div class="bcell"><label>Name<input type="text" autocomplete="name"></label><label>Phone<input type="tel" autocomplete="tel"></label></div>
+      <div class="bcell"><label>Treatment<select><option>Facial</option><option>Body Massage</option><option>Nails</option><option>Hair Removal / Waxing</option><option>Lashes &amp; Brows</option></select></label><label>Preferred date<input type="date"></label></div>
+      <div class="bcell"><label>Notes<textarea rows="4"></textarea></label></div>
+      <div class="bcell" id="bAction"><button class="bsubmit" id="bsubmit">Send request</button><button class="bclose" id="bclose">&larr; Back to site</button></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var IMG = {
+    dryers:"https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=70",
+    chairs:"https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=800&q=70",
+    cut:   "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=800&q=70",
+    colour:"https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=800&q=70"
+  };
+
+  function T(k,b,extra){return '<div class="pad center theme-rouge"><span class="kicker">'+k+'</span><h2>'+b+'</h2>'+(extra||'')+'<a class="booknow" href="#">&rsaquo; Book now</a></div>';}
+  function INFO(k,b,inner){return '<div class="pad"><span class="kicker">'+k+'</span>'+(b?'<h2>'+b+'</h2>':'')+inner+'</div>';}
+  function LIST(rows){return '<ul>'+rows.map(function(r){return '<li><span>'+r[0]+'</span>'+(r[1]?'<span>'+r[1]+'</span>':'')+'</li>';}).join('')+'</ul>';}
+  function PH(u){return '<div class="photo" style="background-image:url(\''+u+'\')"></div>';}
+  function NOTE(t){return '<div class="pad center"><p class="stmt">'+t+'</p></div>';}
+  function HPHOTO(u){return '<div class="hphoto" style="background-image:url(\''+u+'\')"></div>';}
+  function HSTRIP(items){var dots=items.map(function(_,k){return '<span class="hdot'+(k===0?' on':'')+'"></span>';}).join('');return '<div class="hwrap"><div class="hstrip">'+items.join('')+'</div><div class="hctrl"><button class="harrow prev" aria-label="Previous">&lsaquo;</button><div class="hdots">'+dots+'</div><button class="harrow next" aria-label="Next">&rsaquo;</button></div></div>';}
+  function HACC(n,s){return '<div class="haward"><div class="aw">'+n+'</div><div class="by">'+s+'</div></div>';}
+  function SVC(cat,rows){return '<div class="hsvc"><span class="kicker">'+cat+'</span>'+LIST(rows)+'</div>';}
+  function chunk(a,n){var o=[];for(var i=0;i<a.length;i+=n){o.push(a.slice(i,i+n));}return o;}
+  function CAT(cat,rows,per){return HSTRIP(chunk(rows,per).map(function(p){return SVC(cat,p);}));}
+  function MAP(){return '<iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.openstreetmap.org/export/embed.html?bbox=-0.4326%2C53.8384%2C-0.4186%2C53.8454&layer=mapnik&marker=53.8419%2C-0.4256"></iframe>';}
+
+  var SECTIONS = [
+    { name:"Book",
+      title:T('01 &middot; Cloud Nine','Book'),
+      rest:[
+        HSTRIP([HACC('CACI','Non-surgical facials'),HACC('Dermalogica','Skin health'),HACC('Eve Taylor','Aromatherapy facials'),HACC('Dermalux LED','Light therapy'),HACC('OPI &amp; Gel Bottle','Nail systems')]),
+        PH(IMG.chairs),
+        INFO('The salon','', '<p class="stmt">One of Beverley&rsquo;s longest-established beauty salons &mdash; relax, rejuvenate and soothe.</p>'),
+        INFO('Find us','', '<p class="contact2">9 Landress Lane, Beverley<br>HU17 8HA<br>01482 882805</p>')
+      ]},
+    { name:"Services",
+      title:T('02 &middot; Treatments','Services'),
+      rest:[
+        CAT('Facials',[
+          ['CACI Facial (60m)','£53'],
+          ['CACI Course of 10','£440'],
+          ['CACI Jowl Lift (30m)','£26'],
+          ['CACI Jowl Lift &times;10','£230'],
+          ['CACI Eye Revive (30m)','£36'],
+          ['CACI Eye Revive &times;10','£310'],
+          ['CACI &amp; Hydratone (75m)','£70'],
+          ['CACI Hydratone (30m)','£28'],
+          ['Dermalogica Face Mapping (30m)','£20'],
+          ['Dermalogica ProSkin 30','£31'],
+          ['Dermalogica ProSkin 60','£49.50'],
+          ['Eve Taylor Express (45m)','£30'],
+          ['Eve Taylor Relax (60m)','£39'],
+          ['Eve Taylor Intensive (60m)','£45'],
+          ['Dermalux LED (45m)','£40'],
+          ['Dermalux LED Add-on (30m)','£20'],
+          ['Dermalux Course of 6','£200'],
+          ['Dermalux Course of 12','£400']
+        ],6),
+        CAT('Waxing',[
+          ['Half Leg','£19'],
+          ['&frac34; Leg','£23'],
+          ['Full Leg','£30'],
+          ['Full Leg &amp; Bikini','£36'],
+          ['Half Leg, Underarm &amp; Bikini','£34'],
+          ['Bikini / Underarm','£13'],
+          ['Extended Bikini','£19'],
+          ['Arm','£18'],
+          ['Back / Chest','£24'],
+          ['Lip or Chin','£9.50'],
+          ['Lip &amp; Chin','£15'],
+          ['Electrolysis (5&ndash;25m)','£11&ndash;26']
+        ],6),
+        CAT('Nails',[
+          ['Luxury Manicure (45m)','£23'],
+          ['Luxury Pedicure (60m)','£30'],
+          ['Gel Polish (45m)','£29'],
+          ['Gel Bottle Builder Gel','£29'],
+          ['Gel Bottle Builder &amp; Colour','£33'],
+          ['File &amp; Polish','£13'],
+          ['Gel Removal + Mini Mani','£15'],
+          ['Manicure &amp; Gel (60m)','£38'],
+          ['Pedicure &amp; Gel (75m)','£46'],
+          ['Removal &amp; Re-Application','£5']
+        ],5),
+        '<div class="pad svc2"><span class="kicker">Lashes &amp; Brows</span>'+LIST([
+            ['Eyebrow Shape','£11'],
+            ['Eyelash Tint','£15'],
+            ['Eyebrow Tint','£10.50'],
+            ['Lash &amp; Brow Tint','£22']
+          ])+'<span class="kicker k2">Massage</span>'+LIST([
+            ['Full Body Massage (60m)','£46'],
+            ['Back, Neck &amp; Shoulder (30m)','£25']
+          ])+'</div>'
+      ]},
+    { name:"Gallery",
+      title:T('03 &middot; The Studio','Gallery'),
+      rest:[
+        HSTRIP([HPHOTO(IMG.chairs),HPHOTO(IMG.cut),HPHOTO(IMG.colour),HPHOTO(IMG.dryers)]),
+        PH(IMG.dryers),
+        HSTRIP([HPHOTO(IMG.colour),HPHOTO(IMG.chairs),HPHOTO(IMG.cut)]),
+        NOTE('Soft light. Skilled hands.')
+      ]},
+    { name:"Social",
+      title:T('04 &middot; Follow','Social'),
+      rest:[
+        HSTRIP([HPHOTO(IMG.cut),HPHOTO(IMG.colour),HPHOTO(IMG.chairs),HPHOTO(IMG.dryers)]),
+        INFO('Follow','Us','<p class="contact2" style="word-break:break-word;margin:-.1rem 0 .5rem">@cloudninebeautybeverley</p><a class="btn" href="https://www.instagram.com/cloudninebeautybeverley" target="_blank" rel="noopener">Instagram</a><a class="btn" href="https://www.facebook.com/cloudninebeverley" target="_blank" rel="noopener">Facebook</a>'),
+        PH(IMG.colour),
+        NOTE('Latest looks &amp; offers on Instagram &amp; Facebook.')
+      ]},
+    { name:"Visit",
+      title:T('05 &middot; Find us','Visit','<p class="addr">9 Landress Lane<br>Beverley HU17 8HA</p>'),
+      rest:[
+        INFO('Hours','', '<p class="stmt">By appointment</p><p class="contact2" style="margin-top:.45rem">Call the salon to check availability &amp; book your time. 24 hours&rsquo; notice required for cancellations.</p>'),
+        MAP(),
+        INFO('Call','', '<p class="contact2">01482 882805<br>facebook.com/cloudninebeverley</p>'),
+        '<div class="pad owner"><span class="kicker">Salon Owner</span><h2>Siobhan Brown</h2><p class="obio">I am an internationally qualified Beauty Therapist (CIDESCO, CIBTAC) and have worked in the beauty industry for over 30 years &mdash; in roles from sales to training for some of the largest skincare companies and spas in the world. I bought Cloud Nine in 2010, refurbished the salon and introduced several new treatments and brands. I am passionate about skincare and love carrying out facials tailor-made to suit the individual.</p></div>'
+      ]}
+  ];
+  function cellsFor(i){ var s=SECTIONS[i]; var arr=s.rest.slice(); arr.splice(i%5,0,s.title); return arr; }
+
+  var flips = Array.prototype.slice.call(document.querySelectorAll('.panel[data-flip]'));
+  var cue = document.getElementById('cue');
+  var menuEl = document.getElementById('menu');
+  var overlay = document.getElementById('bookOverlay');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  var state = flips.map(function(p,col){
+    var inner=document.createElement('div');inner.className='panel-inner';
+    var fa=document.createElement('div');fa.className='face fa';
+    var fb=document.createElement('div');fb.className='face fb';
+    fa.innerHTML=cellsFor(0)[col];
+    inner.appendChild(fa);inner.appendChild(fb);p.appendChild(inner);
+    return {inner:inner,fa:fa,fb:fb,col:col,half:0};
+  });
+
+  SECTIONS.forEach(function(sec,i){
+    var b=document.createElement('button');b.className='mi'+(i===0?' active':'');b.setAttribute('data-i',i);
+    b.innerHTML='<span class="mn">'+('0'+(i+1)).slice(-2)+'</span><span class="ml">'+sec.name+'</span>';
+    b.addEventListener('click',function(){ goTo(i); });
+    menuEl.appendChild(b);
+  });
+  var menuItems=Array.prototype.slice.call(menuEl.children);
+
+  function bookingOpen(){ return overlay.classList.contains('open'); }
+  function openBooking(){ overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); }
+  function closeBooking(){ overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); }
+
+  var brandHome=document.getElementById('brandHome');
+  if(brandHome){ brandHome.addEventListener('click',function(){ if(bookingOpen()) closeBooking(); goTo(0); }); }
+
+  function updateDots(strip){
+    var dots=strip.parentNode.querySelector('.hdots'); if(!dots) return;
+    var w=strip.clientWidth||1, idx=Math.round(strip.scrollLeft/w), ds=dots.children;
+    for(var k=0;k<ds.length;k++){ ds[k].classList.toggle('on',k===idx); }
+  }
+  document.addEventListener('scroll',function(e){
+    var s=e.target; if(s && s.classList && s.classList.contains('hstrip')) updateDots(s);
+  },true);
+
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    var bn = t.closest ? t.closest('.booknow') : null;
+    if(bn){ e.preventDefault(); openBooking(); return; }
+    if(t.id==='bclose'){ closeBooking(); return; }
+    if(t.id==='bsubmit'){ document.getElementById('bAction').innerHTML='<div class="bok">Thanks &mdash; we&rsquo;ll confirm shortly.</div><button class="bclose" id="bclose">&larr; Back to site</button>'; return; }
+    var arrow = t.closest ? t.closest('.harrow') : null;
+    if(arrow){
+      var wrap = arrow.closest('.hwrap');
+      var strip = wrap && wrap.querySelector('.hstrip');
+      if(!strip) return;
+      var w=strip.clientWidth||1;
+      var pages=Math.max(1,Math.round(strip.scrollWidth/w));
+      var idx=Math.round(strip.scrollLeft/w);
+      var next=idx+(arrow.classList.contains('prev')?-1:1);
+      if(next>=pages) next=0; if(next<0) next=pages-1;
+      strip.scrollTo({left:next*w,behavior:'smooth'});
+    }
+  });
+
+  var current=0, locked=false, releaseTimer=null;
+  function setActive(i){ menuItems.forEach(function(m,k){m.classList.toggle('active',k===i);}); }
+
+  function goTo(target){
+    if(target===current || target<0 || target>=SECTIONS.length) return;
+    var sign = target>current ? 1 : -1;
+    var cells = cellsFor(target);
+    state.forEach(function(s){
+      s.half += sign;
+      var incoming = (Math.abs(s.half)%2===0) ? s.fa : s.fb;
+      incoming.innerHTML = cells[s.col];
+      if(!reduce){ s.inner.style.transitionDelay = (s.col*60)+'ms'; }
+      s.inner.style.transform = 'rotateY('+(s.half*180)+'deg)';
+    });
+    current=target; setActive(target); cue.classList.add('hide');
+  }
+
+  if(reduce) return;
+
+  var accum=0, THRESHOLD=45;
+  function handle(dy){
+    clearTimeout(releaseTimer);
+    releaseTimer=setTimeout(function(){locked=false;accum=0;}, 150);
+    if(locked) return;
+    accum+=dy;
+    if(Math.abs(accum)<THRESHOLD) return;
+    var dir=accum>0?1:-1; accum=0; locked=true;
+    goTo(dir>0?Math.min(current+1,SECTIONS.length-1):Math.max(current-1,0));
+  }
+
+  window.addEventListener('wheel',function(e){
+    if(bookingOpen()) return;                              // let the booking page scroll
+    var strip = e.target.closest ? e.target.closest('.hstrip') : null;
+    if(strip && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var svc = e.target.closest ? e.target.closest('.hsvc,.owner') : null;
+    if(svc && svc.scrollHeight - svc.clientHeight > 2){
+      var atTop = svc.scrollTop <= 0, atBot = svc.scrollTop + svc.clientHeight >= svc.scrollHeight - 1;
+      if(!((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBot))) return; // let the card scroll
+    }
+    e.preventDefault(); handle(e.deltaY);
+  },{passive:false});
+
+  var lastY=null, startX=0, startY=0, hMode=false;
+  window.addEventListener('touchstart',function(e){var t=e.touches[0];lastY=t.clientY;startX=t.clientX;startY=t.clientY;hMode=false;},{passive:true});
+  window.addEventListener('touchmove',function(e){
+    if(bookingOpen() || lastY===null) return;
+    var t=e.touches[0], dx=t.clientX-startX, dy=t.clientY-startY;
+    var strip = e.target.closest ? e.target.closest('.hstrip') : null;
+    if(!hMode && strip && Math.abs(dx)>Math.abs(dy) && Math.abs(dx)>8){ hMode=true; }
+    if(hMode){ lastY=t.clientY; return; }
+    var svc = e.target.closest ? e.target.closest('.hsvc,.owner') : null;
+    if(svc && svc.scrollHeight - svc.clientHeight > 2){
+      var atTop = svc.scrollTop <= 0, atBot = svc.scrollTop + svc.clientHeight >= svc.scrollHeight - 1;
+      if(!((dy > 0 && atTop) || (dy < 0 && atBot))){ lastY=t.clientY; return; } // let the card scroll
+    }
+    handle((lastY-t.clientY)*1.4); lastY=t.clientY; e.preventDefault();
+  },{passive:false});
+  window.addEventListener('touchend',function(){lastY=null;hMode=false;});
+  window.addEventListener('keydown',function(e){
+    if(bookingOpen()){ if(e.key==='Escape') closeBooking(); return; }
+    if(e.key==='ArrowDown'||e.key===' '){e.preventDefault();handle(THRESHOLD+1);}
+    if(e.key==='ArrowUp'){e.preventDefault();handle(-THRESHOLD-1);}
+  });
+})();
+</script>
+</body>
+</html>
