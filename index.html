@@ -59,6 +59,14 @@
   .haward{justify-content:center;}
   .hsvc{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:38px;}
   .hsvc::-webkit-scrollbar{display:none;}
+  /* frosted fade at the foot of the price panels so rows dissolve
+     behind the arrows/dots instead of colliding with them */
+  .hsvc:after{content:"";position:sticky;bottom:-1px;flex:0 0 auto;height:46px;margin-top:auto;
+    pointer-events:none;
+    background:linear-gradient(to top,#fff 42%,rgba(255,255,255,.9) 70%,rgba(255,255,255,0));
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+    -webkit-mask-image:linear-gradient(to top,#000 46%,transparent);
+            mask-image:linear-gradient(to top,#000 46%,transparent);}
   .hsvc .kicker{position:sticky;top:0;background:#fff;padding-bottom:.4rem;z-index:1;}
   .haward .aw{font-size:clamp(1rem,1.55vw,1.4rem);font-weight:700;text-transform:uppercase;line-height:1.02;}
   .haward .by{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;}
