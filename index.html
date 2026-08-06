@@ -57,21 +57,21 @@
   .hphoto{background-size:cover;background-position:center;background-color:var(--paper-2);}
   .haward,.hsvc{background:#fff;padding:clamp(16px,2vw,30px);display:flex;flex-direction:column;gap:.4rem;color:var(--ink);}
   .haward{justify-content:center;}
-  .hsvc{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:38px;}
+  .hsvc{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:58px;}
   .hsvc::-webkit-scrollbar{display:none;}
-  /* frosted fade at the foot of the price panels so rows dissolve
-     behind the arrows/dots instead of colliding with them */
-  .hsvc:after{content:"";position:sticky;bottom:-1px;flex:0 0 auto;height:46px;margin-top:auto;
+  /* frosted strip pinned to the true bottom edge of the panel, so there is no
+     gap beneath it. the arrows sit above it; the rows blur away underneath. */
+  .hwrap:after{content:"";position:absolute;left:0;right:0;bottom:0;height:58px;z-index:2;
     pointer-events:none;
-    background:linear-gradient(to top,#fff 42%,rgba(255,255,255,.9) 70%,rgba(255,255,255,0));
-    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
-    -webkit-mask-image:linear-gradient(to top,#000 46%,transparent);
-            mask-image:linear-gradient(to top,#000 46%,transparent);}
+    -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+    background:linear-gradient(to top,rgba(255,255,255,.78),rgba(255,255,255,0));
+    -webkit-mask-image:linear-gradient(to top,#000 55%,transparent);
+            mask-image:linear-gradient(to top,#000 55%,transparent);}
   .hsvc .kicker{position:sticky;top:0;background:#fff;padding-bottom:.4rem;z-index:1;}
   .haward .aw{font-size:clamp(1rem,1.55vw,1.4rem);font-weight:700;text-transform:uppercase;line-height:1.02;}
   .haward .by{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;}
   /* bottom control bar: arrows + dots, minimal black */
-  .hctrl{position:absolute;left:0;right:0;bottom:8px;z-index:3;display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:none;}
+  .hctrl{position:absolute;left:0;right:0;bottom:8px;z-index:5;display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:none;}
   .harrow{border:0;background:none;color:#000;font-size:30px;line-height:1;cursor:pointer;font-family:inherit;font-weight:700;opacity:.7;padding:0 2px;pointer-events:auto;text-shadow:0 0 5px rgba(255,255,255,.65);transition:opacity .2s,transform .2s;}
   .harrow:hover{opacity:1;}
   .harrow.next:hover{transform:translateX(2px);}
